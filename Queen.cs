@@ -17,38 +17,33 @@ namespace MiniChess
 
         public override Piece GetCopy()
         {
-            if (this != null)
-            {
-                Queen pieceCopy = new Queen(this.IsWhite);
-                pieceCopy.HasMoved = this.HasMoved;
-                pieceCopy.Piecesign = this.Piecesign;
-                pieceCopy.Position = this.Position;
-                pieceCopy.AttackPath = this.AttackPath;
-                pieceCopy.MovePath = this.MovePath;
-                pieceCopy.IsWhite = this.IsWhite;
-                pieceCopy.biDirectional = this.biDirectional;
-                return pieceCopy;
-            }
-            else
-                return this;
+            Queen pieceCopy = new Queen(this.IsWhite);
+            pieceCopy.HasMoved = this.HasMoved;
+            pieceCopy.Piecesign = this.Piecesign;
+            pieceCopy.Position = this.Position;
+            pieceCopy.AttackPath = this.AttackPath;
+            pieceCopy.MovePath = this.MovePath;
+            pieceCopy.IsWhite = this.IsWhite;
+            pieceCopy.biDirectional = this.biDirectional;
+            return pieceCopy;
         }
 
-        public override bool ValidateMove(Position newPos)
+        public override bool ValidateMove(Position newPos, GameState state)
         {
-            if (ValidatedDiagonalPathAttack(true, newPos))
+            if (ValidatedDiagonalPathAttack(true, newPos, state))
                 return true;
-            else if (ValidateHorizontalPathAttack(true, newPos))
+            else if (ValidateHorizontalPathAttack(true, newPos, state))
                 return true;
-            else if (ValidateVerticalPathAttack(true, newPos))
+            else if (ValidateVerticalPathAttack(true, newPos, state))
                 return true;
             return false;
         }
 
-        public override void InitializePaths()
+        public override void InitializePaths(GameState state)
         {
-            this.ProcessDiagonalPath(true);
-            this.ProcessHorizontalPath(true);
-            this.ProcessVerticalPath(true);
+            this.ProcessDiagonalPath(true, state);
+            this.ProcessHorizontalPath(true, state);
+            this.ProcessVerticalPath(true, state);
             this.ProcessDefault();
         }
     }

@@ -16,8 +16,8 @@ namespace MiniChess
 
         public override Piece GetCopy()
         {
-            Ghost copy = new Ghost(this.PawnSoul);
-            return copy;
+            Ghost pieceCopy = new Ghost(this.PawnSoul);
+            return pieceCopy;
         }
     }
 }

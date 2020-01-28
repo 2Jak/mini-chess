@@ -26,32 +26,27 @@ namespace MiniChess
 
         public override Piece GetCopy()
         {
-            if (this != null)
-            {
-                Bishop pieceCopy = new Bishop(this.IsWhite, this.Position.Column);
-                pieceCopy.HasMoved = this.HasMoved;
-                pieceCopy.Piecesign = this.Piecesign;
-                pieceCopy.Position = this.Position;
-                pieceCopy.AttackPath = this.AttackPath;
-                pieceCopy.MovePath = this.MovePath;
-                pieceCopy.IsWhite = this.IsWhite;
-                pieceCopy.biDirectional = this.biDirectional;
-                return pieceCopy;
-            }
-            else
-                return this;
+            Bishop pieceCopy = new Bishop(this.IsWhite, this.Position.Column);
+            pieceCopy.HasMoved = this.HasMoved;
+            pieceCopy.Piecesign = this.Piecesign;
+            pieceCopy.Position = this.Position;
+            pieceCopy.AttackPath = this.AttackPath;
+            pieceCopy.MovePath = this.MovePath;
+            pieceCopy.IsWhite = this.IsWhite;
+            pieceCopy.biDirectional = this.biDirectional;
+            return pieceCopy;
         }
 
-        public override bool ValidateMove(Position newPos)
+        public override bool ValidateMove(Position newPos, GameState state)
         {
-            if (ValidatedDiagonalPathAttack(true, newPos))
+            if (ValidatedDiagonalPathAttack(true, newPos, state))
                 return true;
             return false;
         }
 
-        public override void InitializePaths()
+        public override void InitializePaths(GameState state)
         {
-            this.ProcessDiagonalPath(true);
+            this.ProcessDiagonalPath(true, state);
             this.ProcessDefault();
         }
     }

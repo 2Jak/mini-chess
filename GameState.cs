@@ -7,21 +7,24 @@ namespace MiniChess
 {
     public class GameState
     {
-        public static Piece[,] Board = new Piece[8, 8];
-        public static string[] TurnLog = new string[0];
-        public static Piece[,] LastTurn = new Piece[8, 8];
-        private King blacKing = null;
-        private King whiteKing = null;
+        Piece[,] Board = new Piece[8, 8];
+        string[] TurnLog = new string[0];
+        Piece[,] LastTurn = new Piece[8, 8];
+        King blacKing = null;
+        King whiteKing = null;
         bool whiteTurn = true;
         bool gameWon = false;
         bool isDraw = false;
         int moveCount = 0;
-        static int repeatOfBoards = 0;
-        public static int blackPieceCount = 16;
-        public static int whitePieceCount = 16;
-        public static int noCaptures = 0;
-        public static int noPawnMoves = 0;
-        static string log = "";
+        int repeatOfBoards = 0;
+        public int blackPieceCount = 16;
+        public int whitePieceCount = 16;
+        public int noCaptures = 0;
+        public int noPawnMoves = 0;
+        string log = "";
+        const string forfiet = "/ff";
+        const string callForDraw = "/CallDraw";
+
 
         public GameState()
 
@@ -40,10 +43,9 @@ namespace MiniChess
         #region Game State Checks
         void MasterChecker()
         {
-            if (moveCount > 4)
-                checkMat();
-            whiteKing.UpdateCheckState();
-            blacKing.UpdateCheckState();
+            checkMat();
+            whiteKing.UpdateCheckState(this);
+            blacKing.UpdateCheckState(this);
             checkStalemate();
             checkLeftMaterial();
             checkBoardRepeats();
@@ -60,12 +62,12 @@ namespace MiniChess
 
         void checkMat()
         {
-            if (whiteKing.CheckForMate())
+            if (whiteKing.CheckForMate(this))
             {
                 gameWon = true;
                 Console.WriteLine("Congratulation!! \nWhite Player Won!");
             }
-            else if (blacKing.CheckForMate())
+            else if (blacKing.CheckForMate(this))
             {
                 gameWon = true;
                 Console.WriteLine("Congratulation!! \nBlack Player Won!");
@@ -87,7 +89,7 @@ namespace MiniChess
         {
             bool checkStalemate = true;
             foreach (Position kingPos in blacKing.MovePath.Paths)
-                if (blacKing.ValidateOutOfMove(kingPos))
+                if (blacKing.ValidateOutOfMove(kingPos, this))
                     checkStalemate = false;
             if (checkStalemate)
             {
@@ -96,7 +98,7 @@ namespace MiniChess
             }
             checkStalemate = true;
             foreach (Position kingPos in whiteKing.MovePath.Paths)
-                if (whiteKing.ValidateOutOfMove(kingPos))
+                if (whiteKing.ValidateOutOfMove(kingPos, this))
                     checkStalemate = false;
             if (checkStalemate)
             {
@@ -173,7 +175,7 @@ namespace MiniChess
                 Console.WriteLine("Please enter a valid move and press ENTER: ");
                 userInput = Console.ReadLine();
                 legalString = isLegalString(userInput);
-                if (userInput != "/callDraw" && userInput != "/ff" && legalString)
+                if (userInput != callForDraw && userInput != forfiet && legalString)
                 {
                     userInput = processInput2Nums(userInput);
                     legalString = new Position(int.Parse(userInput[2].ToString()), int.Parse(userInput[3].ToString())).ValidateLegalPosion();
@@ -202,7 +204,7 @@ namespace MiniChess
                 Console.WriteLine("Please enter a valid move and press ENTER: ");
                 userInput = pcInput;
                 legalString = isLegalString(userInput);
-                if (userInput != "/callDraw" && userInput != "/ff" && legalString)
+                if (userInput != callForDraw && userInput != forfiet && legalString)
                 {
                     userInput = processInput2Nums(userInput);
                     legalString = new Position(int.Parse(userInput[2].ToString()), int.Parse(userInput[3].ToString())).ValidateLegalPosion();
@@ -245,11 +247,11 @@ namespace MiniChess
         bool isLegalString(string userInput)
         {
             string lowerInput = userInput.ToLower();
-            if (userInput == "/ff")
+            if (userInput == forfiet)
                 return true;
-            if (userInput == "/callDraw")
+            if (userInput == callForDraw)
                 return true;
-            if (userInput.Length > 4)
+            if (userInput.Length != 4)
                 return false;
             char[] legalChar = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
             char[] legalNumbers = new char[] { '1', '2', '3', '4', '5', '6', '7', '8' };
@@ -278,7 +280,7 @@ namespace MiniChess
 
         void useSpecialMove(string playerMove)
         {
-            if (playerMove == "/ff")
+            if (playerMove == forfiet)
             {
                 isDraw = true;
                 Console.WriteLine("{0} Player has resigned!", whiteTurn ? "White" : "Black");
@@ -291,7 +293,7 @@ namespace MiniChess
 
         bool iSpecialMove(string playerMove)
         {
-            if (playerMove == "/callDraw" || playerMove == "/ff")
+            if (playerMove == callForDraw || playerMove == forfiet)
                 return true;
             else
                 return false;
@@ -381,9 +383,9 @@ namespace MiniChess
         void updateKingState()
         {
             if (whiteTurn)
-                whiteKing.UpdateCheckState();
+                whiteKing.UpdateCheckState(this);
             else
-                blacKing.UpdateCheckState();
+                blacKing.UpdateCheckState(this);
         }
 
         void swtichTurn() { whiteTurn = !whiteTurn; }
@@ -429,7 +431,7 @@ namespace MiniChess
         bool makeMove(string playerMove)
         {
             Piece liftedPiece = getPieceByPosition(new Position(int.Parse(playerMove[0].ToString()), int.Parse(playerMove[1].ToString())));
-            return liftedPiece.Move(new Position(int.Parse(playerMove[2].ToString()), int.Parse(playerMove[3].ToString())));
+            return liftedPiece.Move(new Position(int.Parse(playerMove[2].ToString()), int.Parse(playerMove[3].ToString())), this);
         }
 
         void askDraw(bool white)
@@ -513,7 +515,7 @@ namespace MiniChess
         {
             foreach (Piece piece in Board)
                 if (piece != null)
-                    piece.InitializePaths();
+                    piece.InitializePaths(this);
         }
 
         void ghostBusters()
@@ -559,6 +561,31 @@ namespace MiniChess
                 }
             return boardCopy;
         }
+
+        public void ResetRepeats()
+        {
+            repeatOfBoards = 0;
+            ResetTurnLog();
+        }
+
+        public void RemovePawn(Pawn pawn)
+        {
+            Board[pawn.Position.Row, pawn.Position.Column] = null;
+        }
+
+        public void MovePiece(Position last, Position next, Piece piece)
+        {
+            Board[next.Row, next.Column] = piece;
+            Board[last.Row, last.Column] = null;
+            piece.Position = next;
+        }
+
+        public void ResetTurnLog()
+        {
+            TurnLog = new string[0];
+        }
+        
+        public Piece[,] GetBoard() { return this.Board; }
         #endregion
 
         #region Tests
@@ -659,42 +686,5 @@ namespace MiniChess
 
         }*/
         #endregion
-
-
-
-
-        public static void RemovePawn(Pawn pawn)
-        {
-            Board[pawn.Position.Row, pawn.Position.Column] = null;
-        }
-
-        public static void MovePiece(Position last, Position next, Piece piece)
-        {
-            GameState.Board[next.Row, next.Column] = piece;
-            GameState.Board[last.Row, last.Column] = null;
-            piece.Position = next;
-        }
-
-        public static Piece GetPiece(bool white, Piece type)
-        {
-            foreach (Piece piece in Board)
-            {
-                if (type is King)
-                    if (piece is King)
-                        return piece;
-            }
-            return null;
-        } //static(?)
-
-        public static void ResetRepeats()
-        {
-            repeatOfBoards = 0;
-            ResetTurnLog();
-        }
-
-        public static void ResetTurnLog()
-        {
-            TurnLog = new string[0];
-        }
     }
 }

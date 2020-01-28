@@ -26,34 +26,34 @@ namespace MiniChess
             this.MovePath = new Path();
         }
 
-        public virtual bool Move(Position newPos)
+        public virtual bool Move(Position newPos, GameState state)
         {
-            if (this.ValidateMove(newPos))
+            if (this.ValidateMove(newPos, state))
             {
-                GameState.MovePiece(this.Position, newPos, this);
+                state.MovePiece(this.Position, newPos, this);
                 if (this.HasMoved != true)
                     this.HasMoved = true;
-                this.InitializePaths();
+                this.InitializePaths(state);
                 return true;
             }
             return false;    
         }
-        public virtual bool ValidateMove(Position newPos) { return false; }
-        public virtual void InitializePaths() { }
+        public virtual bool ValidateMove(Position newPos, GameState state) { return false; }
+        public virtual void InitializePaths(GameState state) { }
 
 
         #region Diagonal Processing
-        protected bool ValidateDiagonalPathMove(bool full, Position newPos)
+        protected bool ValidateDiagonalPathMove(bool full, Position newPos, GameState state)
         {
             if (this.biDirectional)
             {
-                if (validateDiagonalPathMove(0, -1, -1, full, newPos))
+                if (validateDiagonalPathMove(0, -1, -1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathMove(2, -1, 1, full, newPos))
+                else if (validateDiagonalPathMove(2, -1, 1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathMove(6, 1, -1, full, newPos))
+                else if (validateDiagonalPathMove(6, 1, -1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathMove(8, 1, 1, full, newPos))
+                else if (validateDiagonalPathMove(8, 1, 1, full, newPos, state))
                     return true;
                 return false;
             }
@@ -61,33 +61,33 @@ namespace MiniChess
             {
                 if (this.IsWhite)
                 {
-                    if (validateDiagonalPathMove(0, -1, -1, full, newPos))
+                    if (validateDiagonalPathMove(0, -1, -1, full, newPos, state))
                         return true;
-                    else if (validateDiagonalPathMove(2, -1, 1, full, newPos))
+                    else if (validateDiagonalPathMove(2, -1, 1, full, newPos, state))
                         return true;
                 }
                 else
                 {
-                    if (validateDiagonalPathMove(6, 1, -1, full, newPos))
+                    if (validateDiagonalPathMove(6, 1, -1, full, newPos, state))
                         return true;
-                    else if (validateDiagonalPathMove(8, 1, 1, full, newPos))
+                    else if (validateDiagonalPathMove(8, 1, 1, full, newPos, state))
                         return true;
                 }
             }
             return false;
         }
 
-        protected bool ValidatedDiagonalPathAttack(bool full, Position newPos)
+        protected bool ValidatedDiagonalPathAttack(bool full, Position newPos, GameState state)
         {
             if (this.biDirectional)
             {
-                if (validateDiagonalPathAttack(0, -1, -1, full, newPos))
+                if (validateDiagonalPathAttack(0, -1, -1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathAttack(2, -1, 1, full, newPos))
+                else if (validateDiagonalPathAttack(2, -1, 1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathAttack(6, 1, -1, full, newPos))
+                else if (validateDiagonalPathAttack(6, 1, -1, full, newPos, state))
                     return true;
-                else if (validateDiagonalPathAttack(8, 1, 1, full, newPos))
+                else if (validateDiagonalPathAttack(8, 1, 1, full, newPos, state))
                     return true;
                 return false;
             }
@@ -95,88 +95,88 @@ namespace MiniChess
             {
                 if (this.IsWhite)
                 {
-                    if (validateDiagonalPathAttack(0, -1, -1, full, newPos))
+                    if (validateDiagonalPathAttack(0, -1, -1, full, newPos, state))
                         return true;
-                    else if (validateDiagonalPathAttack(2, -1, 1, full, newPos))
+                    else if (validateDiagonalPathAttack(2, -1, 1, full, newPos, state))
                         return true;
                 }
                 else
                 {
-                    if (validateDiagonalPathAttack(6, 1, -1, full, newPos))
+                    if (validateDiagonalPathAttack(6, 1, -1, full, newPos, state))
                         return true;
-                    else if (validateDiagonalPathAttack(8, 1, 1, full, newPos))
+                    else if (validateDiagonalPathAttack(8, 1, 1, full, newPos, state))
                         return true;
                 }
             }
             return false;
         }
 
-        protected void ProcessDiagonalPath(bool full)
+        protected void ProcessDiagonalPath(bool full, GameState state)
         {
             if (biDirectional)
             {
-                processDiagonalMove(0, -1, -1, full);
-                processDiagonalAttack(0, -1, -1, full);
-                processDiagonalMove(2, -1, 1, full);
-                processDiagonalAttack(2, -1, 1, full);
-                processDiagonalMove(6, 1, -1, full);
-                processDiagonalAttack(6, 1, -1, full);
-                processDiagonalMove(8, 1, 1, full);
-                processDiagonalAttack(8, 1, 1, full);
+                processDiagonalMove(0, -1, -1, full, state);
+                processDiagonalAttack(0, -1, -1, full, state);
+                processDiagonalMove(2, -1, 1, full, state);
+                processDiagonalAttack(2, -1, 1, full, state);
+                processDiagonalMove(6, 1, -1, full, state);
+                processDiagonalAttack(6, 1, -1, full, state);
+                processDiagonalMove(8, 1, 1, full, state);
+                processDiagonalAttack(8, 1, 1, full, state);
             }
             else
             {
                 if (IsWhite)
                 {
-                    processDiagonalMove(0, -1, -1, full);
-                    processDiagonalAttack(0, -1, -1, full);
-                    processDiagonalMove(2, -1, 1, full);
-                    processDiagonalAttack(2, -1, 1, full);
+                    processDiagonalMove(0, -1, -1, full, state);
+                    processDiagonalAttack(0, -1, -1, full, state);
+                    processDiagonalMove(2, -1, 1, full, state);
+                    processDiagonalAttack(2, -1, 1, full, state);
                 }
                 else
                 {
-                    processDiagonalMove(6, 1, -1, full);
-                    processDiagonalAttack(6, 1, -1, full);
-                    processDiagonalMove(8, 1, 1, full);
-                    processDiagonalAttack(8, 1, 1, full);
+                    processDiagonalMove(6, 1, -1, full, state);
+                    processDiagonalAttack(6, 1, -1, full, state);
+                    processDiagonalMove(8, 1, 1, full, state);
+                    processDiagonalAttack(8, 1, 1, full, state);
                 }
             }
 
         }
 
-        private bool validateDiagonalPathMove(int position, int xChange, int yChange, bool full, Position newPos)
+        private bool validateDiagonalPathMove(int position, int xChange, int yChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkDiagonalPathBounds(position, row, col, this.MovePath.Paths[position].Row, this.MovePath.Paths[position].Column); row += xChange, col += yChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private bool validateDiagonalPathAttack(int position, int xChange, int yChange, bool full, Position newPos)
+        private bool validateDiagonalPathAttack(int position, int xChange, int yChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkDiagonalPathBounds(position, row, col, this.AttackPath.Paths[position].Row, this.AttackPath.Paths[position].Column); row += xChange, col += yChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private void processDiagonalMove(int position, int xChange, int yChange, bool full)
+        private void processDiagonalMove(int position, int xChange, int yChange, bool full, GameState state)
         {
             if (full)
             {
@@ -186,9 +186,9 @@ namespace MiniChess
                 {
                     move.Row += xChange;
                     move.Column += yChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -202,12 +202,12 @@ namespace MiniChess
                 this.MovePath.Paths[position] = this.Position.OnTheFlyChanges(0, 0);
                 if (!(this is Pawn))
                     if (checkDiagonalBounds(position, this.Position.Row, this.Position.Column))
-                        if (GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)] == null || GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
+                        if (state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)] == null || state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
                             this.MovePath.Paths[position] = new Position(this.Position.Row + xChange, this.Position.Column + yChange);
             }
         }
 
-        private void processDiagonalAttack(int position, int xChange, int yChange, bool full)
+        private void processDiagonalAttack(int position, int xChange, int yChange, bool full, GameState state)
         {
             if (full)
             {
@@ -217,9 +217,9 @@ namespace MiniChess
                 {
                     move.Row += xChange;
                     move.Column += yChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -234,12 +234,12 @@ namespace MiniChess
                 if (checkDiagonalBounds(position, this.Position.Row, this.Position.Column))
                     if (this is Pawn)
                     {
-                        if (GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)] != null && GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
+                        if (state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)] != null && state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
                             this.AttackPath.Paths[position] = new Position(this.Position.Row + xChange, this.Position.Column + yChange);
                     }
                     else
                     {
-                        if (GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)] == null || GameState.Board[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
+                        if (state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)] == null || state.GetBoard()[(this.Position.Row + xChange), (this.Position.Column + yChange)].IsWhite != this.IsWhite)
                             this.AttackPath.Paths[position] = new Position(this.Position.Row + xChange, this.Position.Column + yChange);
                     }
             }
@@ -281,91 +281,91 @@ namespace MiniChess
         #endregion
 
         #region Vertical Processing
-        protected bool ValidateVerticalPathAttack(bool full, Position newPos)
+        protected bool ValidateVerticalPathAttack(bool full, Position newPos, GameState state)
         {
             if (this.biDirectional)
             {
-                if (validateVerticalPathAttack(1, -1, full, newPos))
+                if (validateVerticalPathAttack(1, -1, full, newPos, state))
                     return true;
-                else if (validateVerticalPathAttack(7, 1, full, newPos))
+                else if (validateVerticalPathAttack(7, 1, full, newPos, state))
                     return true;
             }
             else
             {
                 if (this.IsWhite)
                 {
-                    if (validateVerticalPathAttack(1, -1, full, newPos))
+                    if (validateVerticalPathAttack(1, -1, full, newPos, state))
                         return true;
                 }
                 else
-                    if (validateVerticalPathAttack(7, 1, full, newPos))
+                    if (validateVerticalPathAttack(7, 1, full, newPos, state))
                     return true;
             }
             return false;
         }
 
-        protected bool ValidateVerticalPathMove(bool full, Position newPos)
+        protected bool ValidateVerticalPathMove(bool full, Position newPos, GameState state)
         {
 
             if (this.biDirectional)
             {
-                if (validateVerticalPathMove(1, -1, full, newPos))
+                if (validateVerticalPathMove(1, -1, full, newPos, state))
                     return true;
-                else if (validateVerticalPathMove(7, 1, full, newPos))
+                else if (validateVerticalPathMove(7, 1, full, newPos, state))
                     return true;
             }
             else
             {
                 if (this.IsWhite)
                 {
-                    if (validateVerticalPathMove(1, -1, full, newPos))
+                    if (validateVerticalPathMove(1, -1, full, newPos, state))
                         return true;
                 }           
                 else
-                    if (validateVerticalPathMove(7, 1, full, newPos))
+                    if (validateVerticalPathMove(7, 1, full, newPos, state))
                         return true;
             }
             return false;
         }
 
-        protected void ProcessVerticalPath(bool full)
+        protected void ProcessVerticalPath(bool full, GameState state)
         {
             if (this.biDirectional)
             {
-                processVerticalMove(1, -1, full);
-                processVerticalAttack(1, -1, full);
-                processVerticalMove(7, 1, full);
-                processVerticalAttack(7, 1, full);
+                processVerticalMove(1, -1, full, state);
+                processVerticalAttack(1, -1, full, state);
+                processVerticalMove(7, 1, full, state);
+                processVerticalAttack(7, 1, full, state);
             }
             else
             {
                 if (this.IsWhite)
                 {
-                    processVerticalMove(1, -1, full);
-                    processVerticalAttack(1, -1, full);
+                    processVerticalMove(1, -1, full, state);
+                    processVerticalAttack(1, -1, full, state);
                 }
                 else
                 {
-                    processVerticalMove(7, 1, full);
-                    processVerticalAttack(7, 1, full);
+                    processVerticalMove(7, 1, full, state);
+                    processVerticalAttack(7, 1, full, state);
                 }
             }
         }
 
-        private bool validateVerticalPathMove(int position, int xChange, bool full, Position newPos)
+        private bool validateVerticalPathMove(int position, int xChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkVerticalPathBounds(position, row, this.MovePath.Paths[position].Row); row += xChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
                         {
                             if (this is Pawn)
                                 return false;
                             else
-                                return checkCapture(newPos);
+                                return checkCapture(newPos, state);
                         }
                             
                     }
@@ -375,23 +375,23 @@ namespace MiniChess
             return false;
         }
 
-        private bool validateVerticalPathAttack(int position, int xChange, bool full, Position newPos)
+        private bool validateVerticalPathAttack(int position, int xChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkVerticalPathBounds(position, row, this.AttackPath.Paths[position].Row); row += xChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private void processVerticalMove(int position, int xChange, bool full)
+        private void processVerticalMove(int position, int xChange, bool full, GameState state)
         {
             if (full)
             {
@@ -400,9 +400,9 @@ namespace MiniChess
                 while (checkVerticalBounds(position, move.Row))
                 {
                     move.Row += xChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -415,12 +415,12 @@ namespace MiniChess
             {
                 this.MovePath.Paths[position] = this.Position.OnTheFlyChanges(0, 0);
                 if (checkVerticalBounds(position, this.Position.Row))
-                    if (GameState.Board[(this.Position.Row + xChange), this.Position.Column] == null || GameState.Board[(this.Position.Row + xChange), this.Position.Column].IsWhite != this.IsWhite || GameState.Board[this.Position.Row + xChange, this.Position.Column] is Ghost)
+                    if (state.GetBoard()[(this.Position.Row + xChange), this.Position.Column] == null || state.GetBoard()[(this.Position.Row + xChange), this.Position.Column].IsWhite != this.IsWhite || state.GetBoard()[this.Position.Row + xChange, this.Position.Column] is Ghost)
                         this.MovePath.Paths[position] = new Position(this.Position.Row + xChange, this.Position.Column);
             }
         }
 
-        private void processVerticalAttack(int position, int xChange, bool full)
+        private void processVerticalAttack(int position, int xChange, bool full, GameState state)
         {
             if (full)
             {
@@ -429,9 +429,9 @@ namespace MiniChess
                 while (checkVerticalBounds(position, move.Row))
                 {
                     move.Row += xChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -445,7 +445,7 @@ namespace MiniChess
                 this.AttackPath.Paths[position] = this.Position.OnTheFlyChanges(0, 0);
                 if (!(this is Pawn))
                     if (checkVerticalBounds(position, this.Position.Row))
-                        if (GameState.Board[(this.Position.Row + xChange), this.Position.Column] == null || GameState.Board[(this.Position.Row + xChange), this.Position.Column].IsWhite != this.IsWhite || GameState.Board[this.Position.Row + xChange, this.Position.Column] is Ghost)
+                        if (state.GetBoard()[(this.Position.Row + xChange), this.Position.Column] == null || state.GetBoard()[(this.Position.Row + xChange), this.Position.Column].IsWhite != this.IsWhite || state.GetBoard()[this.Position.Row + xChange, this.Position.Column] is Ghost)
                             this.AttackPath.Paths[position] = new Position(this.Position.Row + xChange, this.Position.Column);
             }
         }
@@ -478,65 +478,65 @@ namespace MiniChess
         #endregion
 
         #region Horizontal Processing
-        protected bool ValidateHorizontalPathAttack(bool full, Position newPos)
+        protected bool ValidateHorizontalPathAttack(bool full, Position newPos, GameState state)
         {
-            if (validateHorizontalPathAttack(3, -1, full, newPos))
+            if (validateHorizontalPathAttack(3, -1, full, newPos, state))
                 return true;
-            else if (validateHorizontalPathAttack(5, 1, full, newPos))
+            else if (validateHorizontalPathAttack(5, 1, full, newPos, state))
                 return true;
             return false;
         }
 
-        protected bool ValidateHorizontalPathMove(bool full, Position newPos)
+        protected bool ValidateHorizontalPathMove(bool full, Position newPos, GameState state)
         {
-            if (validateHorizontalPathMove(3, -1, full, newPos))
+            if (validateHorizontalPathMove(3, -1, full, newPos, state))
                 return true;
-            else if (validateHorizontalPathMove(5, 1, full, newPos))
+            else if (validateHorizontalPathMove(5, 1, full, newPos, state))
                 return true;
             return false;
         }
 
-        protected void ProcessHorizontalPath(bool full)
+        protected void ProcessHorizontalPath(bool full, GameState state)
         {
-            processHorizontalMove(3, -1, full);
-            processHorizontalAttack(3, -1, full);
-            processHorizontalMove(5, 1, full);
-            processHorizontalAttack(5, 1, full);
+            processHorizontalMove(3, -1, full, state);
+            processHorizontalAttack(3, -1, full, state);
+            processHorizontalMove(5, 1, full, state);
+            processHorizontalAttack(5, 1, full, state);
         }
 
-        private bool validateHorizontalPathMove(int position, int yChange, bool full, Position newPos)
+        private bool validateHorizontalPathMove(int position, int yChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkHorizontalPathBounds(position, col, this.MovePath.Paths[position].Column); col += yChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private bool validateHorizontalPathAttack(int position, int yChange, bool full, Position newPos)
+        private bool validateHorizontalPathAttack(int position, int yChange, bool full, Position newPos, GameState state)
         {
             for (int row = this.Position.Row, col = this.Position.Column; checkHorizontalPathBounds(position, col, this.AttackPath.Paths[position].Column); col += yChange)
                 if (newPos.Equals(new Position(row, col)))
-                    if (GameState.Board[row, col] != null)
+                    if (state.GetBoard()[row, col] != null)
                     {
-                        if (GameState.Board[row, col].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[row, col].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private void processHorizontalMove(int position, int yChange, bool full)
+        private void processHorizontalMove(int position, int yChange, bool full, GameState state)
         {
             if (full)
             {
@@ -545,9 +545,9 @@ namespace MiniChess
                 while (checkHorizontalBounds(position, move.Column))
                 {
                     move.Column += yChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.MovePath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -560,12 +560,12 @@ namespace MiniChess
             {
                 this.MovePath.Paths[position] = this.Position.OnTheFlyChanges(0, 0);
                 if (checkHorizontalBounds(position, this.Position.Column))
-                    if (GameState.Board[this.Position.Row, (this.Position.Column + yChange)] == null || GameState.Board[this.Position.Row, (this.Position.Column + yChange)].IsWhite != this.IsWhite || GameState.Board[this.Position.Row, this.Position.Column + yChange] is Ghost)
+                    if (state.GetBoard()[this.Position.Row, (this.Position.Column + yChange)] == null || state.GetBoard()[this.Position.Row, (this.Position.Column + yChange)].IsWhite != this.IsWhite || state.GetBoard()[this.Position.Row, this.Position.Column + yChange] is Ghost)
                         this.MovePath.Paths[position] = new Position(this.Position.Row, this.Position.Column + yChange);
             }
         }
 
-        private void processHorizontalAttack(int position, int yChange, bool full)
+        private void processHorizontalAttack(int position, int yChange, bool full, GameState state)
         {
             if (full)
             {
@@ -574,9 +574,9 @@ namespace MiniChess
                 while (checkHorizontalBounds(position, move.Column))
                 {
                     move.Column += yChange;
-                    if (GameState.Board[move.Row, move.Column] == null || GameState.Board[move.Row, move.Column] is Ghost)
+                    if (state.GetBoard()[move.Row, move.Column] == null || state.GetBoard()[move.Row, move.Column] is Ghost)
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
-                    else if (GameState.Board[move.Row, move.Column].IsWhite != this.IsWhite)
+                    else if (state.GetBoard()[move.Row, move.Column].IsWhite != this.IsWhite)
                     {
                         this.AttackPath.Paths[position] = new Position(move.Row, move.Column);
                         break;
@@ -589,7 +589,7 @@ namespace MiniChess
             {
                 this.AttackPath.Paths[position] = this.Position.OnTheFlyChanges(0, 0);
                 if (checkHorizontalBounds(position, this.Position.Column))
-                    if (GameState.Board[this.Position.Row, (this.Position.Column + yChange)] == null || GameState.Board[this.Position.Row, (this.Position.Column + yChange)].IsWhite != this.IsWhite || GameState.Board[this.Position.Row, this.Position.Column + yChange] is Ghost)
+                    if (state.GetBoard()[this.Position.Row, (this.Position.Column + yChange)] == null || state.GetBoard()[this.Position.Row, (this.Position.Column + yChange)].IsWhite != this.IsWhite || state.GetBoard()[this.Position.Row, this.Position.Column + yChange] is Ghost)
                         this.AttackPath.Paths[position] = new Position(this.Position.Row, this.Position.Column + yChange);
             }
         }
@@ -622,55 +622,55 @@ namespace MiniChess
         #endregion
 
         #region Knight Processing
-        protected void ProcessKnightPaths()
+        protected void ProcessKnightPaths(GameState state)
         {
-            processKnightPathAttack();
-            processKnightPathMove();
+            processKnightPathAttack(state);
+            processKnightPathMove(state);
         }
 
-        protected bool ValidateKnightAttack(Position newPos)
+        protected bool ValidateKnightAttack(Position newPos, GameState state)
         {
             foreach (Position pathPos in this.AttackPath.Paths)
                 if (pathPos != null && pathPos.Equals(newPos))
-                    if (GameState.Board[newPos.Row, newPos.Column] != null)
+                    if (state.GetBoard()[newPos.Row, newPos.Column] != null)
                     {
-                        if (GameState.Board[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        protected bool ValidateKnightMove(Position newPos)
+        protected bool ValidateKnightMove(Position newPos, GameState state)
         {
             foreach (Position pathPos in this.MovePath.Paths)
                 if (pathPos != null && pathPos.Equals(newPos))
-                    if (GameState.Board[newPos.Row, newPos.Column] != null)
+                    if (state.GetBoard()[newPos.Row, newPos.Column] != null)
                     {
-                        if (GameState.Board[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
+                        if (state.GetBoard()[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
                             return false;
                         else
-                            return checkCapture(newPos);
+                            return checkCapture(newPos, state);
                     }
                     else
                         return true;
             return false;
         }
 
-        private void processKnightPathAttack()
+        private void processKnightPathAttack(GameState state)
         {
             for (int i = 0; i < 8; i++)
             {
                 Position newKnightPos = this.Position.OnTheFlyChanges(Knight.PositionChangers[i][0], Knight.PositionChangers[i][1]);
                 if (newKnightPos.Row >= 0 && newKnightPos.Row <= 7 && newKnightPos.Column >= 0 && newKnightPos.Column <= 7)
-                    if (GameState.Board[newKnightPos.Row, newKnightPos.Column] != null)
+                    if (state.GetBoard()[newKnightPos.Row, newKnightPos.Column] != null)
                     {
-                        if (!(GameState.Board[newKnightPos.Row, newKnightPos.Column] is Ghost))
+                        if (!(state.GetBoard()[newKnightPos.Row, newKnightPos.Column] is Ghost))
                         {
-                            if (GameState.Board[newKnightPos.Row, newKnightPos.Column].IsWhite != this.IsWhite)
+                            if (state.GetBoard()[newKnightPos.Row, newKnightPos.Column].IsWhite != this.IsWhite)
                                 this.AttackPath.Paths[i] = newKnightPos;
                         }
                         else this.AttackPath.Paths[i] = newKnightPos;
@@ -685,17 +685,17 @@ namespace MiniChess
             this.AttackPath.Paths[8] = this.Position.OnTheFlyChanges(0, 0);
         }
 
-        private void processKnightPathMove()
+        private void processKnightPathMove(GameState state)
         {
             for (int i = 0; i < 8; i++)
             {
                 Position newKnightPos = this.Position.OnTheFlyChanges(Knight.PositionChangers[i][0], Knight.PositionChangers[i][1]);
                 if (newKnightPos.Row >= 0 && newKnightPos.Row <= 7 && newKnightPos.Column >= 0 && newKnightPos.Column <= 7)
-                    if (GameState.Board[newKnightPos.Row, newKnightPos.Column] != null)
+                    if (state.GetBoard()[newKnightPos.Row, newKnightPos.Column] != null)
                     {
-                        if (!(GameState.Board[newKnightPos.Row, newKnightPos.Column] is Ghost))
+                        if (!(state.GetBoard()[newKnightPos.Row, newKnightPos.Column] is Ghost))
                         {
-                            if (GameState.Board[newKnightPos.Row, newKnightPos.Column].IsWhite != this.IsWhite)
+                            if (state.GetBoard()[newKnightPos.Row, newKnightPos.Column].IsWhite != this.IsWhite)
                                 this.MovePath.Paths[i] = newKnightPos;
                         }
                         else this.MovePath.Paths[i] = newKnightPos;
@@ -717,12 +717,12 @@ namespace MiniChess
             this.AttackPath.Paths[4] = this.Position.OnTheFlyChanges(0, 0);
         }
 
-        private bool checkCapture(Position destenation)
+        private bool checkCapture(Position destenation, GameState state)
         {
-            if (GameState.Board[destenation.Row, destenation.Column] != null)
+            if (state.GetBoard()[destenation.Row, destenation.Column] != null)
                 if (this is King)
                 {
-                    if (GameState.Board[destenation.Row, destenation.Column] is King)
+                    if (state.GetBoard()[destenation.Row, destenation.Column] is King)
                         return false;
                     else if (((King)this).isUnderCheckCheck)
                     {
@@ -730,38 +730,38 @@ namespace MiniChess
                     }
                     else
                     {
-                        return capture(destenation);
+                        return capture(destenation, state);
                     }
                 }
                 else
                 {
-                    return capture(destenation);
+                    return capture(destenation, state);
                 }
             else
                 return true;
         }
 
-        private bool capture(Position destenation)
+        private bool capture(Position destenation, GameState state)
         {
-            if (GameState.Board[destenation.Row, destenation.Column] is Ghost && this is Pawn)
+            if (state.GetBoard()[destenation.Row, destenation.Column] is Ghost && this is Pawn)
             {
-                GameState.RemovePawn(((Ghost)GameState.Board[destenation.Row, destenation.Column]).PawnSoul);
-                GameState.noCaptures = 0;
-                GameState.ResetRepeats();
+                state.RemovePawn(((Ghost)state.GetBoard()[destenation.Row, destenation.Column]).PawnSoul);
+                state.noCaptures = 0;
+                state.ResetRepeats();
                 if (this.IsWhite)
-                    GameState.blackPieceCount--;
+                    state.blackPieceCount--;
                 else
-                    GameState.whitePieceCount--;
+                    state.whitePieceCount--;
                 return true;
             }
-            else if (!(GameState.Board[destenation.Row, destenation.Column] is Ghost))
+            else if (!(state.GetBoard()[destenation.Row, destenation.Column] is Ghost))
             {
-                GameState.noCaptures = 0;
-                GameState.ResetRepeats();
+                state.noCaptures = 0;
+                state.ResetRepeats();
                 if (this.IsWhite)
-                    GameState.blackPieceCount--;
+                    state.blackPieceCount--;
                 else
-                    GameState.whitePieceCount--;
+                    state.whitePieceCount--;
                 return true;
             }
             else
@@ -770,20 +770,15 @@ namespace MiniChess
 
         public virtual Piece GetCopy()
         {
-            if (this != null && !(this is Ghost))
-            {
-                Piece pieceCopy = new Piece();
-                pieceCopy.HasMoved = this.HasMoved;
-                pieceCopy.Piecesign = this.Piecesign;
-                pieceCopy.Position = this.Position;
-                pieceCopy.AttackPath = this.AttackPath;
-                pieceCopy.MovePath = this.MovePath;
-                pieceCopy.IsWhite = this.IsWhite;
-                pieceCopy.biDirectional = this.biDirectional;
-                return pieceCopy;
-            }
-            else
-                return this;
+            Piece pieceCopy = new Piece();
+            pieceCopy.HasMoved = this.HasMoved;
+            pieceCopy.Piecesign = this.Piecesign;
+            pieceCopy.Position = this.Position;
+            pieceCopy.AttackPath = this.AttackPath;
+            pieceCopy.MovePath = this.MovePath;
+            pieceCopy.IsWhite = this.IsWhite;
+            pieceCopy.biDirectional = this.biDirectional;
+            return pieceCopy;
         }
     }
 }

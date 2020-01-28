@@ -20,21 +20,21 @@ namespace MiniChess
             return string.Format("{0}K", IsWhite ? "W" : "B");
         }
 
-        public override bool ValidateMove(Position newPos)
+        public override bool ValidateMove(Position newPos, GameState state)
         {
-            if (base.ValidateDiagonalPathMove(false, newPos))
+            if (base.ValidateDiagonalPathMove(false, newPos, state))
             {
-                if (!validateNotNext2King(newPos) && (validateReachbleByEnemy(newPos) == null))
+                if (!validateNotNext2King(newPos, state) && (validateReachbleByEnemy(newPos, state) == null))
                     return true;
             }
-            else if (base.ValidateHorizontalPathMove(false, newPos))
+            else if (base.ValidateHorizontalPathMove(false, newPos, state))
             {
-                if (!validateNotNext2King(newPos) && (validateReachbleByEnemy(newPos) == null))
+                if (!validateNotNext2King(newPos, state) && (validateReachbleByEnemy(newPos, state) == null))
                     return true;
             }
-            else if (base.ValidateVerticalPathMove(false, newPos))
+            else if (base.ValidateVerticalPathMove(false, newPos, state))
             {
-                if (!validateNotNext2King(newPos) && (validateReachbleByEnemy(newPos) == null))
+                if (!validateNotNext2King(newPos, state) && (validateReachbleByEnemy(newPos, state) == null))
                     return true;
             }
             else
@@ -42,58 +42,58 @@ namespace MiniChess
             return false;
         }
 
-        public bool ValidateOutOfMove(Position newPos)
+        public bool ValidateOutOfMove(Position newPos, GameState state)
         {
-            if (GameState.Board[newPos.Row, newPos.Column] != null && GameState.Board[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
+            if (state.GetBoard()[newPos.Row, newPos.Column] != null && state.GetBoard()[newPos.Row, newPos.Column].IsWhite == this.IsWhite)
                 return true;
             else
             {
                 isUnderCheckCheck = true;
-                bool validMove = ValidateMove(newPos);
+                bool validMove = ValidateMove(newPos, state);
                 isUnderCheckCheck = false;
-                return validMove && validateAreaUnderThreat(newPos);
+                return validMove && validateAreaUnderThreat(newPos, state);
             }               
         }
 
-        public override bool Move(Position newPos)
+        public override bool Move(Position newPos, GameState state)
         {
             if (checkIfMoveCastling(newPos))
             {
-                if (validateCastling(newPos))
+                if (validateCastling(newPos, state))
                 {
                     if (newPos.Column == 6)
                     {
-                        GameState.MovePiece(this.Position, newPos, this);
-                        GameState.MovePiece(castlingRook.Position, newPos.OnTheFlyChanges(0, -1), castlingRook);
+                        state.MovePiece(this.Position, newPos, this);
+                        state.MovePiece(castlingRook.Position, newPos.OnTheFlyChanges(0, -1), castlingRook);
                         castlingRook.HasMoved = true;
                         this.HasMoved = true;
-                        castlingRook.InitializePaths();
+                        castlingRook.InitializePaths(state);
                         castlingRook = null;
-                        this.InitializePaths();
-                        GameState.ResetTurnLog();
+                        this.InitializePaths(state);
+                        state.ResetTurnLog();
                         return true;
                     }
                     else
                     {
-                        GameState.MovePiece(this.Position, newPos, this);
-                        GameState.MovePiece(castlingRook.Position, newPos.OnTheFlyChanges(0, 1), castlingRook);
+                        state.MovePiece(this.Position, newPos, this);
+                        state.MovePiece(castlingRook.Position, newPos.OnTheFlyChanges(0, 1), castlingRook);
                         castlingRook.HasMoved = true;
                         this.HasMoved = true;
-                        castlingRook.InitializePaths();
-                        this.InitializePaths();
+                        castlingRook.InitializePaths(state);
+                        this.InitializePaths(state);
                         castlingRook = null;
-                        GameState.ResetTurnLog();
+                        state.ResetTurnLog();
                         return true;
                     }
                 }
                 else
                 {
-                    if (ValidateMove(newPos))
+                    if (ValidateMove(newPos, state))
                     {
-                        GameState.MovePiece(this.Position, newPos, this);
+                        state.MovePiece(this.Position, newPos, this);
                         if (this.HasMoved != true)
                             this.HasMoved = true;
-                        this.InitializePaths();
+                        this.InitializePaths(state);
                         return true;
                     }
                     else
@@ -102,12 +102,12 @@ namespace MiniChess
             }
             else
             {
-                if (ValidateMove(newPos))
+                if (ValidateMove(newPos, state))
                 {
-                    GameState.MovePiece(this.Position, newPos, this);
+                    state.MovePiece(this.Position, newPos, this);
                     if (this.HasMoved != true)
                         this.HasMoved = true;
-                    this.InitializePaths();
+                    this.InitializePaths(state);
                     return true;
                 }
                 else
@@ -115,37 +115,32 @@ namespace MiniChess
             }           
         }
 
-        public override void InitializePaths()
+        public override void InitializePaths(GameState state)
         {
-            this.ProcessDiagonalPath(false);
-            this.ProcessHorizontalPath(false);
-            this.ProcessVerticalPath(false);
+            this.ProcessDiagonalPath(false, state);
+            this.ProcessHorizontalPath(false, state);
+            this.ProcessVerticalPath(false, state);
             this.ProcessDefault();
         }
 
         public override Piece GetCopy()
         {
-            if (this != null)
-            {
-                King pieceCopy = new King(this.IsWhite);
-                pieceCopy.HasMoved = this.HasMoved;
-                pieceCopy.Piecesign = this.Piecesign;
-                pieceCopy.Position = this.Position;
-                pieceCopy.AttackPath = this.AttackPath;
-                pieceCopy.MovePath = this.MovePath;
-                pieceCopy.IsWhite = this.IsWhite;
-                pieceCopy.biDirectional = this.biDirectional;
-                return pieceCopy;
-            }
-            else
-                return this;
+            King pieceCopy = new King(this.IsWhite);
+            pieceCopy.HasMoved = this.HasMoved;
+            pieceCopy.Piecesign = this.Piecesign;
+            pieceCopy.Position = this.Position;
+            pieceCopy.AttackPath = this.AttackPath;
+            pieceCopy.MovePath = this.MovePath;
+            pieceCopy.IsWhite = this.IsWhite;
+            pieceCopy.biDirectional = this.biDirectional;
+            return pieceCopy;
         }
 
 
         #region King's Special Checks
-        private bool validateAreaUnderThreat(Position newPos)
+        private bool validateAreaUnderThreat(Position newPos, GameState state)
         {
-            foreach (Piece piece in GameState.Board)
+            foreach (Piece piece in state.GetBoard())
                 if (piece != null && piece.IsWhite != this.IsWhite && !(piece is Ghost))
                     foreach (Position piecePos in piece.AttackPath.Paths)
                         if (piecePos != null)
@@ -154,19 +149,19 @@ namespace MiniChess
             return false;
         }
 
-        private Position validateReachbleByEnemy(Position newPos)
+        private Position validateReachbleByEnemy(Position newPos, GameState state)
         {
-            foreach (Piece piece in GameState.Board)
+            foreach (Piece piece in state.GetBoard())
                 if (piece != null && piece.IsWhite != this.IsWhite && !(piece is Ghost))
-                    if (piece.ValidateMove(newPos))
+                    if (piece.ValidateMove(newPos,state))
                         return piece.Position.OnTheFlyChanges(0, 0);
             return null;
         }
 
-        private bool validateIfAreaProtectable(Position newPos)
+        private bool validateIfAreaProtectable(Position newPos, GameState state)
         {
             if (newPos != null)
-                foreach (Piece piece in GameState.Board)
+                foreach (Piece piece in state.GetBoard())
                     if (piece != null && piece.IsWhite == this.IsWhite && !(piece is Ghost) && !(piece is King))
                         foreach (Position piecePos in piece.MovePath.Paths)
                             if (piecePos != null)
@@ -175,9 +170,9 @@ namespace MiniChess
             return false;
         }
 
-        private bool validateNotNext2King(Position newPos)
+        private bool validateNotNext2King(Position newPos, GameState state)
         {
-            foreach (Piece piece in GameState.Board)
+            foreach (Piece piece in state.GetBoard())
                 if (piece != null && piece.IsWhite != this.IsWhite && piece is King)
                     foreach (Position piecePos in piece.AttackPath.Paths)
                         if (piecePos != null)
@@ -186,15 +181,15 @@ namespace MiniChess
             return false;
         }
 
-        public bool CheckForMate()
+        public bool CheckForMate(GameState state)
         {
             int checkableCount = 0;
             int differentPositionsCount = 1;
             int deffendableCount = 1;
-            if (validateAreaUnderThreat(this.Position))
+            if (validateAreaUnderThreat(this.Position, state))
                 checkableCount++;
             foreach (Position kingPos in this.MovePath.Paths)
-                if (!kingPos.Equals(this.Position) && (validateAreaUnderThreat(kingPos) || validateIfAreaProtectable(validateReachbleByEnemy(kingPos))))
+                if (!kingPos.Equals(this.Position) && (validateAreaUnderThreat(kingPos, state) || validateIfAreaProtectable(validateReachbleByEnemy(kingPos, state),state)))
                 {
                     checkableCount++;
                     differentPositionsCount++;
@@ -202,14 +197,14 @@ namespace MiniChess
                 else if (!kingPos.Equals(this.Position))
                     checkableCount--;
             foreach (Position kingPos in this.MovePath.Paths)
-                if (!kingPos.Equals(this.Position) && validateIfAreaProtectable(kingPos))
+                if (!kingPos.Equals(this.Position) && validateIfAreaProtectable(kingPos, state))
                     deffendableCount++;
             return (checkableCount >= differentPositionsCount && checkableCount > deffendableCount) ? true : false;
         }
 
-        public void UpdateCheckState()
+        public void UpdateCheckState(GameState state)
         {
-            foreach (Piece piece in GameState.Board)
+            foreach (Piece piece in state.GetBoard())
                 if (piece != null && piece.IsWhite != this.IsWhite && !(piece is Ghost))
                     foreach (Position piecePos in piece.AttackPath.Paths)
                         if (piecePos != null)
@@ -240,35 +235,35 @@ namespace MiniChess
             }
         }
 
-        bool validateCastling(Position castlingPos)
+        bool validateCastling(Position castlingPos, GameState state)
         {
-            if (validateCastlingIsRook(castlingPos.Column, castlingPos.Row) && validateCastlingAreaClear(castlingPos.Column, castlingPos.Row) && !this.HasMoved)
+            if (validateCastlingIsRook(castlingPos.Column, castlingPos.Row, state) && validateCastlingAreaClear(castlingPos.Column, castlingPos.Row, state) && !this.HasMoved)
                 return true;
             return false;
         }
 
-        bool validateCastlingIsRook(int column, int row)
+        bool validateCastlingIsRook(int column, int row, GameState state)
         {
             column = (column == 6) ? column + 1 : column - 2;
-            if (GameState.Board[row, column] is Rook && GameState.Board[row, column] != null && GameState.Board[row, column].IsWhite == this.IsWhite && !GameState.Board[row, column].HasMoved)
+            if (state.GetBoard()[row, column] is Rook && state.GetBoard()[row, column] != null && state.GetBoard()[row, column].IsWhite == this.IsWhite && !state.GetBoard()[row, column].HasMoved)
             {
-                castlingRook = (Rook)GameState.Board[row, column];
+                castlingRook = (Rook)state.GetBoard()[row, column];
                 return true;
             }              
             return false;
         }
 
-        bool validateCastlingAreaClear(int column, int row)
+        bool validateCastlingAreaClear(int column, int row, GameState state)
         {
             if (column == 6)
             {
                 for (int i = 3; i > 0; i--, column--)
-                    if (validateAreaUnderThreat(new Position(row, column)) || (GameState.Board[row, column] != null && !this.Position.Equals(new Position(row,column))))
+                    if (validateAreaUnderThreat(new Position(row, column), state) || (state.GetBoard()[row, column] != null && !this.Position.Equals(new Position(row,column))))
                         return false;
             }
             else
                 for (int i = 0; i < 3; i++, column++)
-                    if (validateAreaUnderThreat(new Position(row, column)) || (GameState.Board[row, column] != null && !this.Position.Equals(new Position(row, column))))
+                    if (validateAreaUnderThreat(new Position(row, column), state) || (state.GetBoard()[row, column] != null && !this.Position.Equals(new Position(row, column))))
                         return false;
             return true;
         }
