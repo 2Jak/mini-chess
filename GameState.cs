@@ -396,29 +396,34 @@ namespace MiniChess
             char userChoise = Console.ReadLine().ToLower()[0];
             if (userChoise == 'y')
             {
-                Board[piecePos.Row, piecePos.Column] = new Queen(white);
-                Board[piecePos.Row, piecePos.Column].Position = piecePos;
+                Queen queen = new Queen(white);
+                queen.Position = piecePos;
+                Board[piecePos.Row, piecePos.Column] = queen;
                 updatePaths();
             }
             else
             {
                 Console.WriteLine("Then please enter the key of your desired piece (r-Rook b-Bihsop k-Knight) and press ENTER: ");
-                userChoise = Console.ReadLine().ToLower()[0];
+                string userInput = Console.ReadLine().ToLower();
+                userChoise = (userInput != null) ? userInput[0] : ' ';
                 switch (userChoise)
                 {
                     case 'r':
-                        Board[piecePos.Row, piecePos.Column] = new Rook(white, 0);
-                        Board[piecePos.Row, piecePos.Column].Position = piecePos;
+                        Rook rook = new Rook(white, 0);
+                        rook.Position = piecePos;
+                        Board[piecePos.Row, piecePos.Column] = rook;
                         updatePaths();
                         break;
                     case 'b':
-                        Board[piecePos.Row, piecePos.Column] = new Bishop(white, 0);
-                        Board[piecePos.Row, piecePos.Column].Position = piecePos;
+                        Bishop bishop = new Bishop(white, 0);
+                        bishop.Position = piecePos;
+                        Board[piecePos.Row, piecePos.Column] = bishop;
                         updatePaths();
                         break;
                     case 'k':
-                        Board[piecePos.Row, piecePos.Column] = new Knight(white, 0);
-                        Board[piecePos.Row, piecePos.Column].Position = piecePos;
+                        Knight knight = new Knight(white, 0);
+                        knight.Position = piecePos;
+                        Board[piecePos.Row, piecePos.Column] = knight;
                         updatePaths();
                         break;
                     default:
